@@ -19,7 +19,7 @@ class Player:
             self.hp -= card.rank
         elif card.suit == "d":
             card.equip()
-            self.damage = card.rank
+            self.damage = card.ranke
 
 
 class Card:
