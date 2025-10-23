@@ -12,6 +12,7 @@ class Player:
     def __init__(self):
         self.hp = PLAYER_HP
         self.damage = None
+        self.weapon = None
 
     def select_card(self, card):
         if card.suit == "H":
@@ -21,6 +22,7 @@ class Player:
         elif card.suit == "D":
             card.equip()
             self.damage = card.rank
+            self.weapon = f"{card.rank}{card.suit}"
 
 class Card:
     def __init__(self, suit, rank):
@@ -50,14 +52,14 @@ class Deck:
         random.shuffle(self.cards)
             
     def first_draw(self, room):
-        for i in range(ROOM_COUNT - 1):
+        for i in range(ROOM_COUNT):
             room.cards.append(self.cards.pop(i))
 
     def shuffle(self):
         random.shuffle(self.cards)
 
     def draw_cards(self, room):
-        for i in range(ROOM_COUNT - 2):
+        for i in range(ROOM_COUNT - 1):
             room.card.append(self.cards.pop(i))
 
 class Room:
@@ -65,12 +67,14 @@ class Room:
         self.count = count
         self.cards = []
 
-    def in_play(self):
+    def in_play(self, player):
         print("-----------------")
         print("Dungeon Room:", end=" ")
         for card in self.cards:
-            print(f"{card.rank}{card.suit}", end= ", ")
+            print(f"{card.rank}{card.suit}", end= " ")
         print("\n-----------------")
+        print(f"Player HP: {player.hp}")
+        print(f"Current Weapon: {player.weapon}")
 
     def card_chosen(self, card):
         self.cards.remove(card)
@@ -86,7 +90,7 @@ def main():
     room = Room(ROOM_COUNT)
     deck.first_draw(room)
 
-    room.in_play()
+    room.in_play(player)
 
 
 if __name__ == "__main__":
