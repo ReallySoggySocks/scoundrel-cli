@@ -25,7 +25,8 @@ class Player:
 
         elif card.suit == "S" or card.suit == "C":
             if self.weapon:
-                enemy_damage = self.damage - card_rank
+                enemy_damage = card_rank - self.damage
+
                 if enemy_damage < 0:
                     enemy_damage = 0
 
@@ -56,9 +57,9 @@ class Deck:
     def start_deck(self):
         for s in SUITS:
             for r in RANKS:
-                if (s == "S" or s == "H") and RANKS[r] > 10:
+                if (s == "D" and RANKS[r] > 10) or (s == "H" and RANKS[r] > 10):
                     self.count -= 1
-                    pass
+                    continue
                 else:    
                     self.cards.append(Card(s, r))
         random.shuffle(self.cards)
@@ -72,8 +73,12 @@ class Deck:
 
     def draw_cards(self, room):
         room.count = ROOM_COUNT
-        for i in range(1, ROOM_COUNT):
-            room.cards.append(self.cards.pop(i))
+        if self.count > ROOM_COUNT:
+            for i in range(1, ROOM_COUNT):
+                room.cards.append(self.cards.pop(i))
+        else:
+            for i in range(1, self.count):
+                room.card.append(self.cards.pop(i))
 
 class Room:
     def __init__(self, count):
@@ -86,7 +91,7 @@ class Room:
         for card in self.cards:
             print(f"{card.rank}{card.suit}", end= " ")
         print(f"\n\nHP: {player.hp}")
-        print(f"Weapon: {player.weapon}")
+        print(f"Weapon: {player.weapon} |", end=" ")
         if player.killed[-1] is not None:
             print(f"Previous Monster Slain: {player.killed[-1].rank}{player.killed[-1].suit}")
         print("\n-----------------")
@@ -128,10 +133,10 @@ def main():
 
         os.system("clear")
 
-        if player.hp < 0:
+        if player.hp <= 0:
             print("You Lose!")
             break
-        elif deck.count == 0:
+        elif deck.count == 0 and room.count == 0:
             print("You Win!")
             break
     quit()
