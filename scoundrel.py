@@ -186,8 +186,9 @@ def validate_input(room, inputs, rooms_left):
                     room_suits.append(card.suit)
             
                 if player_rank in room_ranks and player_suit in room_suits:
-                    inputs.append(player_rank + player_suit)
-                    return(player_rank, player_suit)
+                    chosen_card = Card(player_suit, player_rank)
+                    inputs.append(chosen_card.rank + chosen_card.suit)
+                    return chosen_card
                 else:
                     print("Card not in room")
                     continue
@@ -223,10 +224,7 @@ def main():
             room.in_play(player)
             validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
 
-        player_rank = validated_input[0]
-        player_suit = validated_input[1]
-        
-        chosen_card = Card(player_suit, player_rank)
+        chosen_card = validated_input
 
         player.select_card(chosen_card)
         room.card_chosen(chosen_card)
