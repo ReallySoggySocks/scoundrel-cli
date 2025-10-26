@@ -4,7 +4,7 @@ import re
 
 SUITS = ["H", "D", "S", "C"]
 RANKS = {"1" : 1, "2" : 2, "3" : 3, "4" : 4, "5" : 5 , "6" : 6, "7" : 7, "8" : 8, "9" : 9, "10" : 10, "J" : 11, "Q" : 12, "K" :13, "A" : 14}
-MAX_HP = 20000000
+MAX_HP = 20
 DECK_COUNT = 52
 ROOM_COUNT = 4
 
@@ -69,16 +69,14 @@ class Deck:
         for i in range(ROOM_COUNT):
             room.cards.append(self.cards.pop(i))
             self.count -= 1
-
-    def shuffle(self):
-        random.shuffle(self.cards)
+        room.count = ROOM_COUNT
 
     def draw_cards(self, room):
         if self.count > ROOM_COUNT:
             for i in range(1, ROOM_COUNT):
                 room.cards.append(self.cards.pop(i))
                 self.count -= 1
-                room.count += 1
+            room.count = ROOM_COUNT
         else:
             for i in range(1, self.count):
                 room.cards.append(self.cards.pop(i))
@@ -86,9 +84,10 @@ class Deck:
                 room.count += 1
 
 class Room:
-    def __init__(self, count):
+    def __init__(self):
         self.cards = []
-        self.count = count
+        self.count = ROOM_COUNT
+
     def in_play(self, player):
         print("-----------------")
         print("Dungeon Room:", end=" ")
@@ -106,13 +105,36 @@ class Room:
                 self.cards.remove(c)
                 self.count -= 1
 
-def validate_input(room):
+    def player_pass(self, deck):
+        random.shuffle(self.cards)
+        for i in range(len(self.cards)):
+            deck.cards.append(self.cards.pop())
+            self.count -= 1
+
+
+def validate_input(room, inputs, rooms_left):
     while True:
             try:
                 player_input = input("Choose a card: ")
 
                 if player_input.capitalize() == "Q" or player_input.capitalize() == "QUIT":
-                    return player_input.capitalize()
+                    quit()
+                
+                if player_input.capitalize() == "P" or player_input.capitalize() == "PASS":
+                    if len(inputs) != 0 and (inputs[-1] == "P" or inputs[-1] == "PASS"):
+                        print("Previous turn was already passed")
+                        continue
+
+                    if rooms_left <= 1:
+                        print("No rooms left to pass")
+                        continue
+
+                    else:
+                        os.system("clear")
+                        inputs.append(player_input.capitalize())
+                        print("Previous Turn Passed")
+                        return player_input.capitalize()
+                
 
                 if len(player_input) == 2  or len(player_input) == 3:
                     pass
@@ -163,6 +185,7 @@ def validate_input(room):
                     room_suits.append(card.suit)
             
                 if player_rank in room_ranks and player_suit in room_suits:
+                    inputs.append(player_rank + player_suit)
                     return(player_rank, player_suit)
                 else:
                     print("Card not in room")
@@ -175,20 +198,29 @@ def main():
     player = Player()
     deck = Deck()
     deck.start_deck()
-    room = Room(ROOM_COUNT)
+    room = Room()
     deck.first_draw(room)
+    os.system("clear")
+    player_inputs = [None]
+    ROOMS_LEFT = DECK_COUNT // ROOM_COUNT
 
     while True:
-        print(f"Deck Count : {deck.count} | Room Count: {room.count}")
+        if len(player_inputs) > 2:
+            del player_inputs[0]
+
         if room.count == 1:
             deck.draw_cards(room)
+            ROOMS_LEFT -= 1
 
         room.in_play(player)
 
-        validated_input = validate_input(room)
-
-        if validated_input == "Q" or validated_input == "QUIT":
-            quit()
+        validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
+        
+        if validated_input == "P" or validated_input == "PASS":
+            room.player_pass(deck)
+            deck.first_draw(room)
+            room.in_play(player)
+            validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
 
         player_rank = validated_input[0]
         player_suit = validated_input[1]
