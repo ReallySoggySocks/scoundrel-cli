@@ -37,6 +37,7 @@ class Player:
                 self.hp -= card_rank
 
         elif card.suit == "D":
+            self.killed = [None]
             card.equip()
             self.damage = card_rank
             self.weapon = f"{card.rank}{card.suit}"
@@ -59,10 +60,10 @@ class Deck:
         for s in SUITS:
             for r in RANKS:
                 if (s == "D" and RANKS[r] > 10) or (s == "H" and RANKS[r] > 10):
-                    self.count -= 1
                     pass
                 else:    
                     self.cards.append(Card(s, r))
+        self.count = len(self.cards)
         random.shuffle(self.cards)
             
     def first_draw(self, room):
@@ -109,7 +110,7 @@ class Room:
         random.shuffle(self.cards)
         for i in range(len(self.cards)):
             deck.cards.append(self.cards.pop())
-            self.count -= 1
+        self.count = 0
 
 
 def validate_input(room, inputs, rooms_left):
@@ -117,11 +118,11 @@ def validate_input(room, inputs, rooms_left):
             try:
                 player_input = input("Choose a card: ")
 
-                if player_input.capitalize() == "Q" or player_input.capitalize() == "QUIT":
+                if player_input.capitalize() == "Q":
                     quit()
                 
-                if player_input.capitalize() == "P" or player_input.capitalize() == "PASS":
-                    if len(inputs) != 0 and (inputs[-1] == "P" or inputs[-1] == "PASS"):
+                if player_input.capitalize() == "P":
+                    if len(inputs) != 0 and inputs[-1] == "P":
                         print("Previous turn was already passed")
                         continue
 
