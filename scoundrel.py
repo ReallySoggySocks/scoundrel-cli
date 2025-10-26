@@ -1,9 +1,10 @@
 import random
 import os
+import re
 
 SUITS = ["H", "D", "S", "C"]
 RANKS = {"1" : 1, "2" : 2, "3" : 3, "4" : 4, "5" : 5 , "6" : 6, "7" : 7, "8" : 8, "9" : 9, "10" : 10, "J" : 11, "Q" : 12, "K" :13, "A" : 14}
-MAX_HP = 20
+MAX_HP = 20000000
 DECK_COUNT = 52
 ROOM_COUNT = 4
 
@@ -51,15 +52,15 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self.count = DECK_COUNT
         self.cards = []
+        self.count = DECK_COUNT
 
     def start_deck(self):
         for s in SUITS:
             for r in RANKS:
                 if (s == "D" and RANKS[r] > 10) or (s == "H" and RANKS[r] > 10):
                     self.count -= 1
-                    continue
+                    pass
                 else:    
                     self.cards.append(Card(s, r))
         random.shuffle(self.cards)
@@ -67,24 +68,27 @@ class Deck:
     def first_draw(self, room):
         for i in range(ROOM_COUNT):
             room.cards.append(self.cards.pop(i))
+            self.count -= 1
 
     def shuffle(self):
         random.shuffle(self.cards)
 
     def draw_cards(self, room):
-        room.count = ROOM_COUNT
         if self.count > ROOM_COUNT:
             for i in range(1, ROOM_COUNT):
                 room.cards.append(self.cards.pop(i))
+                self.count -= 1
+                room.count += 1
         else:
             for i in range(1, self.count):
-                room.card.append(self.cards.pop(i))
+                room.cards.append(self.cards.pop(i))
+                self.count -= 1
+                room.count += 1
 
 class Room:
     def __init__(self, count):
-        self.count = count
         self.cards = []
-
+        self.count = count
     def in_play(self, player):
         print("-----------------")
         print("Dungeon Room:", end=" ")
@@ -100,8 +104,72 @@ class Room:
         for c in self.cards:
             if card.rank == c.rank and card.suit == c.suit:
                 self.cards.remove(c)
-        self.count -= 1
+                self.count -= 1
 
+def validate_input(room):
+    while True:
+            try:
+                player_input = input("Choose a card: ")
+
+                if player_input.capitalize() == "Q" or player_input.capitalize() == "QUIT":
+                    return player_input.capitalize()
+
+                if len(player_input) == 2  or len(player_input) == 3:
+                    pass
+                else:
+                    print("Invalid Input.")
+                    continue
+        
+                player_rank = re.findall(r"\d", player_input)
+                player_suit = re.findall(r"\D", player_input)
+
+                if len(player_suit) != 0:
+                    pass
+                else:
+                    print("No card suit.")
+                    continue
+
+                if len(player_rank) == 0:
+                    player_rank = str(player_suit[0])
+                    player_suit = str(player_suit[1])
+
+                elif len(player_rank) == 2:
+                    player_rank = "".join(player_rank)
+                    player_suit = str(player_suit[0])
+
+                else:
+                    player_rank = player_rank[0]
+                    player_suit = str(player_suit[0])
+
+                player_suit = player_suit.capitalize()
+                player_rank = player_rank.capitalize()
+
+                if player_suit in SUITS:
+                    pass
+                else:
+                    print("Invalid card suit")
+                    continue
+
+                if player_rank in RANKS:
+                    pass
+                else:
+                    print("Invalid card rank")
+                    continue
+            
+                room_suits = []
+                room_ranks = []
+                for card in room.cards:
+                    room_ranks.append(card.rank)
+                    room_suits.append(card.suit)
+            
+                if player_rank in room_ranks and player_suit in room_suits:
+                    return(player_rank, player_suit)
+                else:
+                    print("Card not in room")
+                    continue
+
+            except ValueError:
+                print("Invalid Card. Please choose a valid card")
 
 def main():
     player = Player()
@@ -110,33 +178,32 @@ def main():
     room = Room(ROOM_COUNT)
     deck.first_draw(room)
 
-    while deck.count > 0:
+    while True:
+        print(f"Deck Count : {deck.count} | Room Count: {room.count}")
         if room.count == 1:
             deck.draw_cards(room)
 
         room.in_play(player)
-        player_input = input("Choose a Card: ")
 
-        if len(player_input) > 2:
-            player_rank = player_input[0] + player_input[1]
-            player_suit = player_input[2]
-        else:
-            player_rank = player_input[0]
-            player_suit = player_input[1]
+        validated_input = validate_input(room)
 
-        chosen_card = Card(player_suit.capitalize(), player_rank.capitalize())
+        if validated_input == "Q" or validated_input == "QUIT":
+            quit()
+
+        player_rank = validated_input[0]
+        player_suit = validated_input[1]
+        
+        chosen_card = Card(player_suit, player_rank)
 
         player.select_card(chosen_card)
         room.card_chosen(chosen_card)
-
-        deck.count -= 1
 
         os.system("clear")
 
         if player.hp <= 0:
             print("You Lose!")
             break
-        elif deck.count == 0 and room.count == 0:
+        elif deck.count <= 1 and room.count == 0:
             print("You Win!")
             break
     quit()
