@@ -44,6 +44,7 @@ class Player:
                         
                     elif player_input == "N":
                         return player_input
+                    
                 except ValueError:
                     print("Invalid Input. Please type Y or N")
             else:
@@ -59,7 +60,10 @@ class Player:
                 self.hp =MAX_HP
 
         elif card.suit == "S" or card.suit == "C":
-            self.player_combat(card)
+            player_combat = self.player_combat(card)
+            if player_combat == "N":
+                return player_combat
+            
 
         elif card.suit == "D":
             self.killed = [None]
@@ -134,7 +138,7 @@ class Room:
         self.count = 0
 
 
-def validate_input(room, inputs, rooms_left):
+def validate_input(player, room, inputs, rooms_left):
     while True:
             try:
                 player_input = input("Choose a card: ")
@@ -209,6 +213,13 @@ def validate_input(room, inputs, rooms_left):
             
                 if player_rank in room_ranks and player_suit in room_suits:
                     chosen_card = Card(player_suit, player_rank)
+
+                    player_selection = player.select_card(chosen_card)
+
+                    if player_selection == "N":
+                        print("Please choose another card.")
+                        continue
+                    
                     inputs.append(chosen_card.rank + chosen_card.suit)
 
                     return chosen_card
@@ -239,21 +250,17 @@ def main():
 
         room.in_play(player)
 
-        validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
+        validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
         
         if validated_input == "P":
             room.player_pass(deck)
             deck.first_draw(room)
             room.in_play(player)
-            validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
+            validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
 
         chosen_card = validated_input
-
-        player_selection = player.select_card(chosen_card)
-        if player_selection == "N":
-            continue
-        else:
-            room.card_chosen(chosen_card)
+        
+        room.card_chosen(chosen_card)
 
         os.system("clear")
 
