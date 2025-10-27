@@ -158,7 +158,7 @@ def tutorial():
 
             print("----------\nHere's how the cards work:")
             print("\n\nCard suits are represented by their first character. (C = Clubs, S = Spades, H = Hearts, D = Diamonds)")
-            print("\n\nSuits are card type:\n-.Clubs(S) and Spades(S) are enemies\n-.Hearts(H) are health potions\n-.Diamonds(D) are weapons")
+            print("\nSuits are card type:\n-.Clubs(S) and Spades(S) are enemies\n-.Hearts(H) are health potions\n-.Diamonds(D) are weapons")
             print("\nRanks are card strength:\n1-10 = Given Value, J = 11, Q = 12, K = 13, A = 14")
             print("----------\n")
             player_input = input("Make sense? ")
@@ -192,27 +192,55 @@ def tutorial():
             print("However, they have durability. I'll explain how that works in a second.")
             print("----------\n")
             player_input == input("Ready to get a feel for it? ")
+            os.system("clear")
             if player_input.capitalize() == "Y":
-                break
+                pass
             elif player_input.capitalize() == "Q":
                 quit()
             else:
                 print("Having fun?")
 
             combat_tutorial()
-            break
+            
+            player_input = input("All set to start? ")
 
+            if player_input.capitalize() == "Y":
+                break
+            elif player_input.capitalize() == "Q":
+                quit()
+            else:
+                ("Alright Buddy.")
+            
         except ValueError:
             print("Plese input a valid response.")
 
-    input("All set to start? ")
-
 def combat_tutorial():
-    pass
+    player = Player()
+
+    room = Room()
+    room.cards = [Card("H", "10"), Card("5", "D"), Card("5", "C"), Card("10", "S")]
+    while True:
+        try:
+            print("Here's what a dungeon room looks like:")
+            room.in_play(player)
+            player_input = input("Look good? ")
+            os.system("clear")
+            if player_input.capitalize() == "Q":
+                quit()
+            elif player_input.capitalize() == "Y":
+                return player_input
+            else:
+                print("...")
+                continue
+
+
+        except ValueError:
+            print("Please type a valid input.")
 
 def validate_input(player, room, inputs, rooms_left):
     while True:
             try:
+                print("(Type q to quit)")
                 player_input = input("Choose a card: ")
                 player_input = player_input.capitalize()
 
