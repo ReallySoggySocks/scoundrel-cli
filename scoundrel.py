@@ -7,6 +7,7 @@ RANKS = {"1" : 1, "2" : 2, "3" : 3, "4" : 4, "5" : 5 , "6" : 6, "7" : 7, "8" : 8
 MAX_HP = 20
 DECK_COUNT = 52
 ROOM_COUNT = 4
+PLAYER_INPUTS = [None]
 
 
 class Player:
@@ -217,31 +218,120 @@ def tutorial():
 
 def combat_tutorial():
     player = Player()
-
     room = Room()
-    room.cards = [Card("H", "10"), Card("5", "D"), Card("5", "C"), Card("10", "S")]
+    room.cards = [Card("H", "10"), Card("D", "5"), Card("C", "5"), Card("S", "10")]
+    rooms_left = 1
+
     while True:
         try:
             print("Here's what a dungeon room looks like:")
             room.in_play(player)
-            player_input = input("Look good? ")
+            print("Every dungeon room starts with 4 cards and decreases everytime you choose one.")
+            print("Your current health and weapon are shown at all times.")
+            print("Let's get you a weapon!")
+            player_input = input("Sound good? ")
             os.system("clear")
             if player_input.capitalize() == "Q":
                 quit()
             elif player_input.capitalize() == "Y":
-                return player_input
+                break
             else:
                 print("...")
                 continue
 
+        except ValueError:
+            print("Please type a valid input")
+
+    while True:
+        player.hp = 20
+        try:
+            print("To choose a card, type the rank and suit.")
+            room.in_play(player)
+            print("For now choose the 5 of diamonds (Type 5d or 5D) to equip it as a weapon.")
+            chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
+
+            if chosen_card.rank != "5" and chosen_card.suit != "D":
+                os.system("clear")
+                print("Please choose the 5 of diamonds")
+                continue
+            else:
+                room.card_chosen(chosen_card)
+
+            os.system("clear")
+            break
+        
+        except ValueError:
+            print("Please type a valid input.")
+
+    while True:
+        player.hp = 20
+        try:
+            print("The card has now been removed from the room.")
+            print("And you have the 5 of diamonds equipped!")
+            room.in_play(player)
+            print("Time to fight with your new weapon. Choose the 5 of clubs this time")
+            chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
+
+            if chosen_card.rank != "5" and chosen_card.suit != "C":
+                os.system("clear")
+                print("Please choose the 5 of clubs")
+                continue
+            else:
+                room.card_chosen(chosen_card)
+                
+            os.system("clear")
+            break
+        
+        except ValueError:
+            print("Please type a vlid input")
+    
+    while True:
+        player.hp = 20
+        try:
+            print("If your weapon is the same or higher rank, you take 0 damage.")
+            print("However, like i mentioned earlier. Weapons have durability.")
+            room.in_play(player)
+            print("See what happens when you try choosing the 10 of spades.")
+            print("You'll be given a choice to fight barehanded (Take ALL of the damage), or choose a different card.")
+            print("For now, type y and fight barehanded .")
+            chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
+
+            if player.hp != 10:
+                os.system("clear")
+                print("please choose the 10 of spades")
+                continue
+            
+            room.card_chosen(chosen_card)
+
+            os.system("clear")
+            break
 
         except ValueError:
             print("Please type a valid input.")
+    
+    while True:
+        player.hp = 10
+        try:
+            print("Weapons only work if the chosen card has a lower rank than the previous card.")
+            print("This resets whenever you get a new weapon though.")
+            room.in_play(player)
+            print("Grab that 10 of hearts to heal up.")
+            chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
+
+            if player.hp != 20:
+                os.system("clear")
+                print("please choose the 10 of hearts")
+                continue
+
+            room.card_chosen(chosen_card)
+            os.system("clear")
+            break
+        except ValueError:
+            print("Please type a vlid input")
 
 def validate_input(player, room, inputs, rooms_left):
     while True:
             try:
-                print("(Type q to quit)")
                 player_input = input("Choose a card: ")
                 player_input = player_input.capitalize()
 
@@ -255,6 +345,10 @@ def validate_input(player, room, inputs, rooms_left):
 
                     elif rooms_left <= 1:
                         print("No rooms left to pass")
+                        continue
+
+                    elif room.count != 4:
+                        print("Can only pass on first turn.")
                         continue
 
                     else:
@@ -318,7 +412,7 @@ def validate_input(player, room, inputs, rooms_left):
                     player_selection = player.select_card(chosen_card)
 
                     if player_selection == "N":
-                        print("Please choose another card.")
+                        print("Please choose a different card")
                         continue
                     
                     inputs.append(chosen_card.rank + chosen_card.suit)
@@ -339,12 +433,11 @@ def main():
     room = Room()
     deck.first_draw(room)
     os.system("clear")
-    player_inputs = [None]
     ROOMS_LEFT = DECK_COUNT // ROOM_COUNT
 
     while True:
-        if len(player_inputs) > 2:
-            del player_inputs[0]
+        if len(PLAYER_INPUTS) > 2:
+            del PLAYER_INPUTS[0]
 
         if room.count == 1:
             deck.draw_cards(room)
@@ -352,13 +445,13 @@ def main():
 
         room.in_play(player)
 
-        validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
+        validated_input = validate_input(player, room, PLAYER_INPUTS, ROOMS_LEFT)
         
         if validated_input == "P":
             room.player_pass(deck)
             deck.first_draw(room)
             room.in_play(player)
-            validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
+            validated_input = validate_input(player, room, PLAYER_INPUTS, ROOMS_LEFT)
 
         chosen_card = validated_input
         
