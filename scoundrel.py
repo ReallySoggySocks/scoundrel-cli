@@ -160,6 +160,7 @@ def tutorial():
             print("\n\nCard suits are represented by their first character. (C = Clubs, S = Spades, H = Hearts, D = Diamonds)")
             print("\nSuits are card type:\n-.Clubs(S) and Spades(S) are enemies\n-.Hearts(H) are health potions\n-.Diamonds(D) are weapons")
             print("\nRanks are card strength:\n1-10 = Given Value, J = 11, Q = 12, K = 13, A = 14")
+            print("\nThere are no red face cards.(H/D, J-A)")
             print("----------\n")
             player_input = input("Make sense? ")
             os.system("clear")
