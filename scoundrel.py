@@ -23,32 +23,32 @@ class Player:
         if previous_enemy != None:
             previous_enemy_damage = RANKS[previous_enemy.rank]
 
-        if self.weapon != None:
+        if self.weapon == None:
+            self.hp -= enemy_damage
+
+        elif self.weapon != None:
             reduced_damage = enemy_damage - self.damage
 
             if reduced_damage < 0:
                 reduced_damage = 0
 
             if previous_enemy != None and previous_enemy_damage < enemy_damage:
-                while True:
-                    try:
-                        player_input = input("Do you wish to fight barehanded?(Y/N): ")
-                        player_input = player_input.capitalize()
+                try:
+                    player_input = input("Do you wish to fight barehanded?(Y/N): ")
+                    player_input = player_input.capitalize()
 
-                        if player_input == "Y":
-                            self.hp -= enemy_damage
-                            self.killed.append(card)
-                            return player_input
+                    if player_input == "Y":
+                        self.hp -= enemy_damage
+                        self.killed.append(card)
+                        return
                         
-                        elif player_input == "N":
-                            return player_input
-                    except ValueError:
-                        print("Invalid Input. Please type Y or N")
+                    elif player_input == "N":
+                        return player_input
+                except ValueError:
+                    print("Invalid Input. Please type Y or N")
             else:
-                self.hp += reduced_damage
+                self.hp -= reduced_damage
                 self.killed.append(card)
-        else:
-            self.hp -= enemy_damage
 
     def select_card(self, card):
         card_rank = RANKS[card.rank]
@@ -134,7 +134,7 @@ class Room:
         self.count = 0
 
 
-def validate_input(player, room, inputs, rooms_left):
+def validate_input(room, inputs, rooms_left):
     while True:
             try:
                 player_input = input("Choose a card: ")
@@ -210,6 +210,7 @@ def validate_input(player, room, inputs, rooms_left):
                 if player_rank in room_ranks and player_suit in room_suits:
                     chosen_card = Card(player_suit, player_rank)
                     inputs.append(chosen_card.rank + chosen_card.suit)
+
                     return chosen_card
                 else:
                     print("Card not in room")
@@ -238,22 +239,21 @@ def main():
 
         room.in_play(player)
 
-        validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
+        validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
         
         if validated_input == "P":
             room.player_pass(deck)
             deck.first_draw(room)
             room.in_play(player)
-            validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
+            validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
 
         chosen_card = validated_input
 
-        player.select_card(chosen_card)
-        if player.select_card(chosen_card) == "N":
-            print("Please choose another card.")
+        player_selection = player.select_card(chosen_card)
+        if player_selection == "N":
             continue
-
-        room.card_chosen(chosen_card)
+        else:
+            room.card_chosen(chosen_card)
 
         os.system("clear")
 
