@@ -1,6 +1,7 @@
 import random
 import os
 import re
+from subprocess import run
 
 SUITS = ["H", "D", "S", "C"]
 RANKS = {"1" : 1, "2" : 2, "3" : 3, "4" : 4, "5" : 5 , "6" : 6, "7" : 7, "8" : 8, "9" : 9, "10" : 10, "J" : 11, "Q" : 12, "K" :13, "A" : 14}
@@ -254,8 +255,8 @@ def combat_tutorial():
                 os.system("clear")
                 print("Please choose the 5 of diamonds")
                 continue
-            else:
-                room.card_chosen(chosen_card)
+            
+            room.card_chosen(chosen_card)
 
             os.system("clear")
             break
@@ -276,8 +277,8 @@ def combat_tutorial():
                 os.system("clear")
                 print("Please choose the 5 of clubs")
                 continue
-            else:
-                room.card_chosen(chosen_card)
+
+            room.card_chosen(chosen_card)
                 
             os.system("clear")
             break
@@ -291,9 +292,9 @@ def combat_tutorial():
             print("If your weapon is the same or higher rank, you take 0 damage.")
             print("However, like i mentioned earlier. Weapons have durability.")
             room.in_play(player)
-            print("See what happens when you try choosing the 10 of spades.")
+            print("When you choose the 10 of spades.")
             print("You'll be given a choice to fight barehanded (Take ALL of the damage), or choose a different card.")
-            print("For now, type y and fight barehanded .")
+            print("For now: choose the 10 of spades, then type y and fight barehanded.")
             chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
 
             if player.hp != 10:
@@ -327,7 +328,10 @@ def combat_tutorial():
             os.system("clear")
             break
         except ValueError:
-            print("Please type a vlid input")
+            print("Please type a valid input")
+
+def pass_tutorial():
+    pass
 
 def validate_input(player, room, inputs, rooms_left):
     while True:
