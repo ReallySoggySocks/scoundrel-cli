@@ -137,6 +137,78 @@ class Room:
             deck.cards.append(self.cards.pop())
         self.count = 0
 
+def tutorial():
+    os.system("clear")
+    while True:
+        try:
+            print("----------\nWelcome to Scoundrel!")
+            print("You can type q at any time to exit")
+            print("If you wish to skip the tutorial, type s")
+            print("----------\n")
+            player_input = input("Type y to continue or q to quit: ")
+            os.system("clear")
+            if player_input.capitalize() == "Q":
+                quit()
+            elif player_input.capitalize() == "Y":
+                pass
+            elif player_input.capitalize() == "S":
+                return
+            else:
+                print("Wrong answer!")
+
+            print("----------\nHere's how the cards work:")
+            print("\n\nCard suits are represented by their first character. (C = Clubs, S = Spades, H = Hearts, D = Diamonds)")
+            print("\n\nSuits are card type:\n-.Clubs(S) and Spades(S) are enemies\n-.Hearts(H) are health potions\n-.Diamonds(D) are weapons")
+            print("\nRanks are card strength:\n1-10 = Given Value, J = 11, Q = 12, K = 13, A = 14")
+            print("----------\n")
+            player_input = input("Make sense? ")
+            os.system("clear")
+            if player_input.capitalize() == "Y":
+                pass
+            elif player_input.capitalize() == "Q":
+                quit()
+            else:
+                print("Wrong again!")
+                continue
+    
+            print("----------\nYou have a max hp of 20 and health potions do not over heal.")
+            print("(If you have 20 hp and grab a 10H, you stay at 20.)")
+            print("You lose the run if your health hits 0 before you clear the dungeon.")
+            print("----------\n")
+            player_input = input("Got it? ")
+            os.system("clear")
+            if player_input.capitalize() == "Y":
+                pass
+            elif player_input.capitalize() == "Q":
+                quit()
+            else:
+                print("Again? Really?")
+                continue
+
+            print("----------")
+            print("Now lets talk about weapons\n")
+            print("Weapons(Diamond cards) reduce the amount of damage you take.")
+            print("The damage is your weapon rank - the enemy rank.")
+            print("However, they have durability. I'll explain how that works in a second.")
+            print("----------\n")
+            player_input == input("Ready to get a feel for it? ")
+            if player_input.capitalize() == "Y":
+                break
+            elif player_input.capitalize() == "Q":
+                quit()
+            else:
+                print("Having fun?")
+
+            combat_tutorial()
+            break
+
+        except ValueError:
+            print("Plese input a valid response.")
+
+    input("All set to start? ")
+
+def combat_tutorial():
+    pass
 
 def validate_input(player, room, inputs, rooms_left):
     while True:
@@ -231,6 +303,7 @@ def validate_input(player, room, inputs, rooms_left):
                 print("Invalid Card. Please choose a valid card")
 
 def main():
+    tutorial()
     player = Player()
     deck = Deck()
     deck.start_deck()
