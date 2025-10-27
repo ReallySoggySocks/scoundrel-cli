@@ -16,6 +16,40 @@ class Player:
         self.weapon = None
         self.killed = [None]
 
+    def player_combat(self, card):
+        enemy_damage = RANKS[card.rank]
+
+        previous_enemy = self.killed[-1]
+        if previous_enemy != None:
+            previous_enemy_damage = RANKS[previous_enemy.rank]
+
+        if self.weapon != None:
+            reduced_damage = enemy_damage - self.damage
+
+            if reduced_damage < 0:
+                reduced_damage = 0
+
+            if previous_enemy != None and previous_enemy_damage < enemy_damage:
+                while True:
+                    try:
+                        player_input = input("Do you wish to fight barehanded?(Y/N): ")
+                        player_input = player_input.capitalize()
+
+                        if player_input == "Y":
+                            self.hp -= enemy_damage
+                            self.killed.append(card)
+                            return player_input
+                        
+                        elif player_input == "N":
+                            return player_input
+                    except ValueError:
+                        print("Invalid Input. Please type Y or N")
+            else:
+                self.hp += reduced_damage
+                self.killed.append(card)
+        else:
+            self.hp -= enemy_damage
+
     def select_card(self, card):
         card_rank = RANKS[card.rank]
 
@@ -25,20 +59,10 @@ class Player:
                 self.hp =MAX_HP
 
         elif card.suit == "S" or card.suit == "C":
-            if self.weapon:
-                enemy_damage = card_rank - self.damage
-
-                if enemy_damage < 0:
-                    enemy_damage = 0
-
-                self.hp -= enemy_damage
-                self.killed.append(card)
-            else:
-                self.hp -= card_rank
+            self.player_combat(card)
 
         elif card.suit == "D":
             self.killed = [None]
-            card.equip()
             self.damage = card_rank
             self.weapon = f"{card.rank}{card.suit}"
 
@@ -47,9 +71,6 @@ class Card:
         self.suit = suit
         self.rank = rank
         self.equipped = False
-
-    def equip(self):
-        self.equipped = True
 
 class Deck:
     def __init__(self):
@@ -113,28 +134,29 @@ class Room:
         self.count = 0
 
 
-def validate_input(room, inputs, rooms_left):
+def validate_input(player, room, inputs, rooms_left):
     while True:
             try:
                 player_input = input("Choose a card: ")
+                player_input = player_input.capitalize()
 
-                if player_input.capitalize() == "Q":
+                if player_input == "Q" or player_input == "QUIT":
                     quit()
                 
-                if player_input.capitalize() == "P":
+                elif player_input == "P" or player_input == "PASS":
                     if len(inputs) != 0 and inputs[-1] == "P":
                         print("Previous turn was already passed")
                         continue
 
-                    if rooms_left <= 1:
+                    elif rooms_left <= 1:
                         print("No rooms left to pass")
                         continue
 
                     else:
                         os.system("clear")
-                        inputs.append(player_input.capitalize())
+                        inputs.append(player_input)
                         print("Previous Turn Passed")
-                        return player_input.capitalize()
+                        return player_input
                 
 
                 if len(player_input) == 2  or len(player_input) == 3:
@@ -216,17 +238,21 @@ def main():
 
         room.in_play(player)
 
-        validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
+        validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
         
-        if validated_input == "P" or validated_input == "PASS":
+        if validated_input == "P":
             room.player_pass(deck)
             deck.first_draw(room)
             room.in_play(player)
-            validated_input = validate_input(room, player_inputs, ROOMS_LEFT)
+            validated_input = validate_input(player, room, player_inputs, ROOMS_LEFT)
 
         chosen_card = validated_input
 
         player.select_card(chosen_card)
+        if player.select_card(chosen_card) == "N":
+            print("Please choose another card.")
+            continue
+
         room.card_chosen(chosen_card)
 
         os.system("clear")
