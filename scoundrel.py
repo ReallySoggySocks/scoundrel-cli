@@ -230,7 +230,7 @@ def combat_tutorial():
             print("Every dungeon room starts with 4 cards and decreases everytime you choose one.")
             print("Your current health and weapon are shown at all times.")
             print("Let's get you a weapon!")
-            player_input = input("Sound good? ")
+            player_input = input("\nSound good? ")
             os.system("clear")
             if player_input.capitalize() == "Q":
                 quit()
@@ -251,7 +251,9 @@ def combat_tutorial():
             print("For now choose the 5 of diamonds (Type 5d or 5D) to equip it as a weapon.")
             chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
 
-            if chosen_card.rank != "5" and chosen_card.suit != "D":
+            if chosen_card.rank == "5" and chosen_card.suit == "D":
+                pass
+            else:
                 os.system("clear")
                 print("Please choose the 5 of diamonds")
                 continue
@@ -273,7 +275,9 @@ def combat_tutorial():
             print("Time to fight with your new weapon. Choose the 5 of clubs this time")
             chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
 
-            if chosen_card.rank != "5" and chosen_card.suit != "C":
+            if chosen_card.rank == "5" and chosen_card.suit == "C":
+                pass
+            else:
                 os.system("clear")
                 print("Please choose the 5 of clubs")
                 continue
@@ -291,10 +295,10 @@ def combat_tutorial():
         try:
             print("If your weapon is the same or higher rank, you take 0 damage.")
             print("However, like i mentioned earlier. Weapons have durability.")
-            room.in_play(player)
-            print("When you choose the 10 of spades.")
+            print("When you choose a card with a higher rank;")
             print("You'll be given a choice to fight barehanded (Take ALL of the damage), or choose a different card.")
-            print("For now: choose the 10 of spades, then type y and fight barehanded.")
+            room.in_play(player)
+            print("For now: choose the 10 of spades, then type y and fight barehanded.\n")
             chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
 
             if player.hp != 10:
@@ -313,8 +317,7 @@ def combat_tutorial():
     while True:
         player.hp = 10
         try:
-            print("Weapons only work if the chosen card has a lower rank than the previous card.")
-            print("This resets whenever you get a new weapon though.")
+            print("Weapon durability only resets whenever you get a new weapon.")
             room.in_play(player)
             print("Grab that 10 of hearts to heal up.")
             chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
