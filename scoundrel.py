@@ -147,7 +147,7 @@ def tutorial():
             print("You can type q at any time to exit")
             print("If you wish to skip the tutorial, type s")
             print("----------\n")
-            player_input = input("Type y to continue or q to quit: ")
+            player_input = input("Type 'y' to continue or 'q' to quit: ")
             os.system("clear")
             if player_input.capitalize() == "Q":
                 quit()
@@ -204,6 +204,7 @@ def tutorial():
                 print("Having fun?")
 
             combat_tutorial()
+            pass_tutorial()
             
             player_input = input("All set to start? ")
 
@@ -288,7 +289,7 @@ def combat_tutorial():
             break
         
         except ValueError:
-            print("Please type a vlid input")
+            print("Please type a valid input")
     
     while True:
         player.hp = 20
@@ -334,7 +335,48 @@ def combat_tutorial():
             print("Please type a valid input")
 
 def pass_tutorial():
-    pass
+    player = Player()
+    room = Room()
+    room.cards = [Card("C", "A"), Card("C", "K"), Card("S", "A"), Card("S", "K")]
+    deck = Deck()
+    deck.cards = [Card("H", "1"), Card("D", "1"), Card("H", "2"), Card("D", "2")]
+    rooms_left = 1
+
+    while True:
+        try:
+            print("Now, let's talk about passing your turn.")
+            room.in_play(player)
+            print("As you can see, this room would be instant death. To get past this room type p to pass your turn.")
+            chosen_card = validate_input(player, room, PLAYER_INPUTS, rooms_left)
+
+            if "P" not in PLAYER_INPUTS:
+                os.system("clear")
+                print("please type 'p' to pass your turn")
+                continue
+            
+            room.player_pass(deck)
+            break
+        except ValueError:
+            print("Please type a valid input")
+
+    while True:
+        try:
+            print("----------")
+            print("Here are the rules for passing:")
+            print("The room you pass gets put back into the bottom of the deck.")
+            print("If you passed last turn you can't pass this turn.")
+            print("Once you reach the end of the deck, there's no more passing")
+            print("----------")
+            player_input = input("Got it? ")
+            if player_input == "Y":
+                break
+            elif player_input == "Q":
+                quit()
+            else:
+                print("Please type 'y' or 'q' ")
+                continue
+        except ValueError:
+            print("Please type a valid input")
 
 def validate_input(player, room, inputs, rooms_left):
     while True:
@@ -440,6 +482,7 @@ def main():
     room = Room()
     deck.first_draw(room)
     os.system("clear")
+    print("Good luck friend...")
     ROOMS_LEFT = DECK_COUNT // ROOM_COUNT
 
     while True:
